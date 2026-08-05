@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NEXORA CONTROL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F5F4; --surface:#FFFFFF; --border:#E4E4E1; --border-fuerte:#D9D9D9;
+  --texto:#1A1A1A; --muted:#555555; --suave:#8A8A88;
+  --primario:#1A1A1A; --primario-texto:#FFFFFF;
+  --verde:#16A34A; --azul:#2563EB; --morado:#7C3AED; --amarillo:#CA8A04;
+  --naranja:#EA580C; --rojo:#DC2626; --gris:#9CA3AF;
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+  --radio:12px;
+}
+html.oscuro{
+  --bg:#111113; --surface:#1A1A1C; --border:#28282C; --border-fuerte:#333338;
+  --texto:#F2F2F2; --muted:#A3A3A7; --suave:#6E6E73;
+  --primario:#F2F2F2; --primario-texto:#111113;
+  --sombra:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit;font-size:14px;color:var(--texto)}
+::placeholder{color:var(--suave)}
+.oculto{display:none!important}
+
+/* ===== PANTALLAS DE ACCESO ===== */
+.acceso{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:28px}
+.marca{display:flex;flex-direction:column;align-items:center;gap:10px}
+.marca .logo{width:44px;height:44px;border-radius:12px;background:var(--primario);color:var(--primario-texto);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.marca h1{font-size:17px;font-weight:700;letter-spacing:.22em}
+.marca span{font-size:11px;color:var(--suave);letter-spacing:.14em;text-transform:uppercase}
+.tarjeta{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:var(--sombra)}
+.tarjeta h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.tarjeta .sub{color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5}
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.campo input{width:100%;padding:11px 13px;border:1px solid var(--border-fuerte);border-radius:10px;background:var(--bg);outline:none;transition:border-color .15s}
+.campo input:focus{border-color:var(--texto)}
+.btn{width:100%;padding:12px;border-radius:10px;background:var(--primario);color:var(--primario-texto);font-weight:600;font-size:14px;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-sec{background:transparent;color:var(--texto);border:1px solid var(--border-fuerte)}
+.error-msj{background:rgba(220,38,38,.08);color:var(--rojo);border:1px solid rgba(220,38,38,.25);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px;line-height:1.5}
+.ok-msj{background:rgba(22,163,74,.08);color:var(--verde);border:1px solid rgba(22,163,74,.25);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+.equipo-pie{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--suave);margin-top:18px}
+.equipo-pie b{color:var(--muted);font-weight:600}
+.equipo-pie button{color:var(--suave);text-decoration:underline;font-size:12px}
+.pase{ text-align:center }
+.pase .icono{font-size:34px;margin-bottom:10px}
+.pase .codigo{font-family:ui-monospace,monospace;background:var(--bg);border:1px dashed var(--border-fuerte);border-radius:10px;padding:10px;font-size:13px;color:var(--muted);margin:16px 0;word-break:break-all}
+
+/* ===== APLICACIÓN ===== */
+.app{display:none;min-height:100dvh}
+.app.visible{display:flex}
+.lateral{width:232px;background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:fixed;top:0;bottom:0;left:0;z-index:40;transition:transform .2s}
+.lateral .marca-mini{display:flex;align-items:center;gap:10px;padding:6px 10px 18px}
+.lateral .marca-mini .logo{width:32px;height:32px;border-radius:9px;background:var(--primario);color:var(--primario-texto);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.lateral .marca-mini div b{font-size:13px;letter-spacing:.14em;display:block}
+.lateral .marca-mini div span{font-size:10px;color:var(--suave);letter-spacing:.1em}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:var(--muted);width:100%;text-align:left;position:relative}
+.nav-item:hover{background:var(--bg)}
+.nav-item.activo{background:var(--bg);color:var(--texto);font-weight:600}
+.nav-item .punto-alerta{position:absolute;right:12px;width:8px;height:8px;border-radius:50%;background:var(--rojo)}
+.nav-item.prox{opacity:.42;cursor:default}
+.nav-item.prox:hover{background:none}
+.nav-item .etapa{margin-left:auto;font-size:10px;color:var(--suave);border:1px solid var(--border);border-radius:6px;padding:2px 6px}
+.nav-sep{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--suave);padding:14px 12px 6px;font-weight:600}
+.lateral .abajo{margin-top:auto;border-top:1px solid var(--border);padding-top:12px}
+.contenido{flex:1;margin-left:232px;padding:26px 30px 90px;max-width:1100px}
+.velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:35}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.topbar h2{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.topbar .der{display:flex;align-items:center;gap:14px}
+.reloj{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted);font-size:13px}
+.chip-usuario{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:5px 12px 5px 6px}
+.chip-usuario .ava{width:26px;height:26px;border-radius:50%;background:var(--primario);color:var(--primario-texto);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.chip-usuario b{font-size:13px}
+.chip-usuario span{font-size:11px;color:var(--suave)}
+.btn-icono{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:15px}
+.hamburguesa{display:none}
+
+.rejilla-metricas{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.metrica{background:var(--surface);border:1px solid var(--border);border-radius:var(--radio);padding:16px 18px;box-shadow:var(--sombra)}
+.metrica .etiqueta{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.metrica .valor{font-size:26px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.punto{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.p-verde{background:var(--verde)}.p-azul{background:var(--azul)}.p-amarillo{background:var(--amarillo)}
+.p-rojo{background:var(--rojo)}.p-gris{background:var(--gris)}.p-naranja{background:var(--naranja)}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radio);box-shadow:var(--sombra);margin-bottom:20px;overflow:hidden}
+.panel .cabeza{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.panel .cabeza h3{font-size:14px;font-weight:700}
+.panel .cabeza .mini{font-size:12px;color:var(--suave)}
+.fila{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.fila:last-child{border-bottom:none}
+.fila .info{flex:1;min-width:150px}
+.fila .info b{font-size:13.5px;display:flex;align-items:center;gap:8px}
+.fila .info span{font-size:12px;color:var(--muted);display:block;margin-top:2px;line-height:1.5}
+.fila .acciones{display:flex;gap:8px;flex-wrap:wrap}
+.mini-btn{padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--border-fuerte);background:var(--surface)}
+.mini-btn:hover{background:var(--bg)}
+.mini-btn.verde{background:var(--verde);border-color:var(--verde);color:#fff}
+.mini-btn.rojo{color:var(--rojo);border-color:rgba(220,38,38,.4)}
+.estado-chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;display:inline-flex;align-items:center;gap:6px}
+.ec-verde{background:rgba(22,163,74,.1);color:var(--verde)}
+.ec-amarillo{background:rgba(202,138,4,.12);color:var(--amarillo)}
+.ec-rojo{background:rgba(220,38,38,.1);color:var(--rojo)}
+.ec-gris{background:rgba(156,163,175,.15);color:var(--muted)}
+.vacio{padding:34px 18px;text-align:center;color:var(--suave);font-size:13px;line-height:1.6}
+.aviso{background:rgba(202,138,4,.09);border:1px solid rgba(202,138,4,.3);border-radius:var(--radio);padding:13px 16px;font-size:13px;margin-bottom:18px;display:flex;gap:10px;align-items:center;line-height:1.5}
+.cargando{padding:30px;text-align:center;color:var(--suave);font-size:13px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--primario);color:var(--primario-texto);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:600;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.ver{opacity:1}
+
+@media (max-width:820px){
+  .lateral{transform:translateX(-100%)}
+  .lateral.abierto{transform:translateX(0)}
+  .velo.abierto{display:block}
+  .contenido{margin-left:0;padding:18px 16px 90px}
+  .hamburguesa{display:flex}
+  .topbar h2{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE CARGA -->
+<div id="v-carga" class="acceso">
+  <div class="marca">
+    <div class="logo">N</div>
+    <h1>NEXORA</h1><span>Control</span>
+  </div>
+  <div class="cargando">Conectando con el servidor…</div>
+</div>
+
+<!-- ASISTENTE DE INSTALACIÓN -->
+<div id="v-instalar" class="acceso oculto">
+  <div class="marca"><div class="logo">N</div><h1>NEXORA</h1><span>Control</span></div>
+  <div class="tarjeta">
+    <h2>Configuración inicial</h2>
+    <p class="sub">Bienvenido, Jesús. Antes de usar el sistema, define la contraseña del superadministrador <b>jesus.admin</b>. Este equipo quedará autorizado automáticamente.</p>
+    <div id="inst-error" class="error-msj oculto"></div>
+    <div class="campo"><label>Nueva contraseña (mínimo 8 caracteres)</label><input type="password" id="inst-pass1" autocomplete="new-password"></div>
+    <div class="campo"><label>Confirmar contraseña</label><input type="password" id="inst-pass2" autocomplete="new-password"></div>
+    <div class="campo"><label>Nombre de este equipo</label><input type="text" id="inst-equipo" placeholder="Ej. iPhone de Jesús"></div>
+    <button class="btn" id="inst-btn" onclick="instalar()">Guardar y continuar</button>
+  </div>
+</div>
+
+<!-- INICIO DE SESIÓN -->
+<div id="v-login" class="acceso oculto">
+  <div class="marca"><div class="logo">N</div><h1>NEXORA</h1><span>Control</span></div>
+  <div class="tarjeta">
+    <h2>Iniciar sesión</h2>
+    <p class="sub">Ingresa con tu usuario y contraseña asignados.</p>
+    <div id="login-error" class="error-msj oculto"></div>
+    <div id="login-ok" class="ok-msj oculto"></div>
+    <div class="campo"><label>Usuario</label><input type="text" id="login-usuario" autocomplete="username" autocapitalize="none"></div>
+    <div class="campo"><label>Contraseña</label><input type="password" id="login-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')entrar()"></div>
+    <button class="btn" id="login-btn" onclick="entrar()">Entrar</button>
+    <div class="equipo-pie">Equipo: <b id="pie-equipo"></b> · <button onclick="renombrarEquipoLocal()">cambiar</button></div>
+  </div>
+</div>
+
+<!-- DISPOSITIVO PENDIENTE -->
+<div id="v-pendiente" class="acceso oculto">
+  <div class="marca"><div class="logo">N</div><h1>NEXORA</h1><span>Control</span></div>
+  <div class="tarjeta pase">
+    <div class="icono">🔒</div>
+    <h2>Equipo pendiente de autorización</h2>
+    <p class="sub">Tus datos son correctos, pero este equipo aún no está autorizado por el administrador. Pídele a <b>Jesús</b> que lo apruebe desde su panel, en la sección <b>Equipos</b>.</p>
+    <div class="codigo" id="pend-codigo"></div>
+    <button class="btn btn-sec" onclick="mostrar('v-login')">Volver a intentar</button>
+  </div>
+</div>
+
+<!-- APLICACIÓN -->
+<div id="app" class="app">
+  <div class="velo" id="velo" onclick="cerrarMenu()"></div>
+  <aside class="lateral" id="lateral">
+    <div class="marca-mini"><div class="logo">N</div><div><b>NEXORA</b><span>CONTROL</span></div></div>
+    <button class="nav-item activo" data-vista="inicio" onclick="irA('inicio')">🏠 Inicio</button>
+    <div id="nav-admin">
+      <div class="nav-sep">Administración</div>
+      <button class="nav-item" data-vista="equipos" onclick="irA('equipos')">💻 Equipos <span class="punto-alerta oculto" id="alerta-equipos"></span></button>
+      <button class="nav-item" data-vista="sesiones" onclick="irA('sesiones')">🟢 Sesiones</button>
+      <button class="nav-item" data-vista="bitacora" onclick="irA('bitacora')">📋 Bitácora</button>
+      <div class="nav-sep">Próximos módulos</div>
+      <button class="nav-item prox">👥 Empleados <span class="etapa">Etapa 2</span></button>
+      <button class="nav-item prox">🗂️ Bases <span class="etapa">Etapa 3</span></button>
+      <button class="nav-item prox">💰 Operaciones <span class="etapa">Etapa 4</span></button>
+      <button class="nav-item prox">📊 Reportes <span class="etapa">Etapa 5</span></button>
+    </div>
+    <div class="abajo">
+      <button class="nav-item" data-vista="config" onclick="irA('config')">⚙️ Configuración</button>
+      <button class="nav-item" onclick="salir()">🚪 Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="contenido">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-icono hamburguesa" onclick="abrirMenu()">☰</button>
+        <h2 id="titulo-vista">Inicio</h2>
+      </div>
+      <div class="der">
+        <span class="reloj" id="reloj">--:--</span>
+        <button class="btn-icono" id="btn-tema" onclick="cambiarTema()" title="Modo claro / oscuro">🌙</button>
+        <div class="chip-usuario"><div class="ava" id="chip-ava">·</div><div><b id="chip-nombre">—</b><br><span id="chip-rol">—</span></div></div>
+      </div>
+    </div>
+
+    <!-- VISTA: INICIO -->
+    <section id="vista-inicio">
+      <div id="aviso-pendientes" class="aviso oculto">⚠️ <span></span></div>
+      <div class="rejilla-metricas">
+        <div class="metrica"><div class="etiqueta"><span class="punto p-azul"></span>Usuarios registrados</div><div class="valor" id="m-usuarios">—</div></div>
+        <div class="metrica"><div class="etiqueta"><span class="punto p-verde"></span>Sesiones activas</div><div class="valor" id="m-sesiones">—</div></div>
+        <div class="metrica"><div class="etiqueta"><span class="punto p-gris"></span>Equipos autorizados</div><div class="valor" id="m-aprobados">—</div></div>
+        <div class="metrica"><div class="etiqueta"><span class="punto p-amarillo"></span>Equipos pendientes</div><div class="valor" id="m-pendientes">—</div></div>
+      </div>
+      <div class="panel">
+        <div class="cabeza"><h3>Etapa 1 completada</h3></div>
+        <div class="vacio" style="text-align:left;color:var(--muted)">
+          Ya funcionan: instalación segura, inicio de sesión con contraseñas cifradas, bloqueo por intentos fallidos, autorización de equipos, cierre remoto de sesiones, cierre automático por inactividad, monitoreo básico y bitácora.<br><br>
+          En la <b>Etapa 2</b> se agregan: alta de empleados y moderadores con permisos, inicio y fin de jornada, asistencias con retardos, estados de trabajo, pausas y comidas.
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA: EQUIPOS -->
+    <section id="vista-equipos" class="oculto">
+      <div class="panel">
+        <div class="cabeza"><h3>Equipos del call center</h3><span class="mini">Solo los equipos aprobados pueden iniciar sesión</span></div>
+        <div id="lista-equipos"><div class="cargando">Cargando…</div></div>
+      </div>
+    </section>
+
+    <!-- VISTA: SESIONES -->
+    <section id="vista-sesiones" class="oculto">
+      <div class="panel">
+        <div class="cabeza"><h3>Sesiones activas</h3><span class="mini">Se actualiza cada 15 segundos</span></div>
+        <div id="lista-sesiones"><div class="cargando">Cargando…</div></div>
+      </div>
+    </section>
+
+    <!-- VISTA: BITÁCORA -->
+    <section id="vista-bitacora" class="oculto">
+      <div class="panel">
+        <div class="cabeza"><h3>Bitácora de actividad</h3><span class="mini">Últimos 100 movimientos · no editable</span></div>
+        <div id="lista-bitacora"><div class="cargando">Cargando…</div></div>
+      </div>
+    </section>
+
+    <!-- VISTA: CONFIGURACIÓN -->
+    <section id="vista-config" class="oculto">
+      <div class="panel">
+        <div class="cabeza"><h3>Cambiar mi contraseña</h3></div>
+        <div style="padding:18px;max-width:380px">
+          <div id="cfg-error" class="error-msj oculto"></div>
+          <div id="cfg-ok" class="ok-msj oculto"></div>
+          <div class="campo"><label>Contraseña actual</label><input type="password" id="cfg-actual"></div>
+          <div class="campo"><label>Nueva contraseña (mínimo 8)</label><input type="password" id="cfg-nueva"></div>
+          <button class="btn" style="width:auto;padding:11px 20px" onclick="cambiarPass()">Guardar</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="cabeza"><h3>Este equipo</h3></div>
+        <div style="padding:18px;font-size:13px;color:var(--muted);line-height:1.8">
+          Nombre local: <b id="cfg-equipo" style="color:var(--texto)"></b> · <button class="mini-btn" onclick="renombrarEquipoLocal()">Cambiar</button><br>
+          Este sistema registra sesiones, actividad laboral y rendimiento básico del equipo con fines de operación. No graba cámara, micrófono ni contenido personal.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= CONFIGURACIÓN ================= */
+const SUPA_URL = "https://koolwdbbhmkrdxzhkubf.supabase.co";
+const SUPA_KEY = "sb_publishable_KvZ-opnMQ8VV5hM5aFd7dw_TzVF2AJm";
+const INACTIVIDAD_MIN = 30;
+
+let token = localStorage.getItem("nx_token") || null;
+let usuario = null;
+let vistaActual = "inicio";
+let ultimaActividad = Date.now();
+let timerRefresco = null;
+
+/* ================= UTILIDADES ================= */
+async function rpc(fn, args = {}) {
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/rpc/${fn}`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPA_KEY,
+        "Authorization": "Bearer " + SUPA_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(args)
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      console.error("RPC", fn, r.status, t);
+      return { ok: false, error: "SERVIDOR" };
+    }
+    return await r.json();
+  } catch (e) {
+    console.error("Red:", e);
+    return { ok: false, error: "SIN_CONEXION" };
+  }
+}
+
+function deviceCodigo() {
+  let c = localStorage.getItem("nx_device");
+  if (!c) { c = crypto.randomUUID(); localStorage.setItem("nx_device", c); }
+  return c;
+}
+function deviceNombre() {
+  let n = localStorage.getItem("nx_device_nombre");
+  if (!n) { n = "Equipo-" + deviceCodigo().slice(0, 4).toUpperCase(); localStorage.setItem("nx_device_nombre", n); }
+  return n;
+}
+function renombrarEquipoLocal() {
+  const n = prompt("Nombre de este equipo:", deviceNombre());
+  if (n && n.trim()) {
+    localStorage.setItem("nx_device_nombre", n.trim());
+    document.getElementById("pie-equipo").textContent = n.trim();
+    const c = document.getElementById("cfg-equipo"); if (c) c.textContent = n.trim();
+    toast("Nombre del equipo actualizado");
+  }
+}
+function infoDispositivo() {
+  const ua = navigator.userAgent;
+  let plat = "Desconocida";
+  if (/iPhone|iPad/.test(ua)) plat = "iOS";
+  else if (/Android/.test(ua)) plat = "Android";
+  else if (/Windows/.test(ua)) plat = "Windows";
+  else if (/Mac/.test(ua)) plat = "macOS";
+  else if (/Linux/.test(ua)) plat = "Linux";
+  let nav = "Navegador";
+  if (/Edg\//.test(ua)) nav = "Edge";
+  else if (/Chrome\//.test(ua)) nav = "Chrome";
+  else if (/Safari\//.test(ua)) nav = "Safari";
+  else if (/Firefox\//.test(ua)) nav = "Firefox";
+  return { plataforma: plat, navegador: nav };
+}
+const ERRORES = {
+  CREDENCIALES: "Usuario o contraseña incorrectos.",
+  BLOQUEADO_INTENTOS: "Demasiados intentos fallidos. Espera unos minutos e inténtalo de nuevo.",
+  USUARIO_SUSPENDIDO: "Tu cuenta está suspendida. Contacta al administrador.",
+  USUARIO_BAJA: "Esta cuenta fue dada de baja.",
+  DISPOSITIVO_RECHAZADO: "Este equipo fue rechazado por el administrador.",
+  SESION_INVALIDA: "Tu sesión terminó. Vuelve a iniciar sesión.",
+  SESION_EXPIRADA: "Tu sesión se cerró por inactividad.",
+  PASSWORD_CORTA: "La contraseña debe tener al menos 8 caracteres.",
+  PASSWORD_ACTUAL: "La contraseña actual no es correcta.",
+  SIN_PERMISO: "No tienes permiso para esta acción.",
+  SIN_CONEXION: "Sin conexión con el servidor. Revisa tu internet.",
+  SERVIDOR: "Error del servidor. Intenta de nuevo.",
+  YA_INSTALADO: "El sistema ya fue configurado. Inicia sesión."
+};
+function textoError(c) { return ERRORES[c] || ("Error: " + c); }
+function fechaCorta(f) {
+  if (!f) return "—";
+  const d = new Date(f);
+  return d.toLocaleDateString("es-MX", { day: "2-digit", month: "short" }) + " " +
+         d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function toast(m) {
+  const t = document.getElementById("toast");
+  t.textContent = m; t.classList.add("ver");
+  setTimeout(() => t.classList.remove("ver"), 2600);
+}
+function mostrar(id) {
+  ["v-carga", "v-instalar", "v-login", "v-pendiente"].forEach(v => document.getElementById(v).classList.add("oculto"));
+  document.getElementById("app").classList.remove("visible");
+  if (id === "app") document.getElementById("app").classList.add("visible");
+  else document.getElementById(id).classList.remove("oculto");
+}
+
+/* ================= TEMA ================= */
+function aplicarTema() {
+  const osc = localStorage.getItem("nx_tema") === "oscuro";
+  document.documentElement.classList.toggle("oscuro", osc);
+  const b = document.getElementById("btn-tema"); if (b) b.textContent = osc ? "☀️" : "🌙";
+}
+function cambiarTema() {
+  localStorage.setItem("nx_tema", localStorage.getItem("nx_tema") === "oscuro" ? "claro" : "oscuro");
+  aplicarTema();
+}
+
+/* ================= ARRANQUE ================= */
+async function iniciar() {
+  aplicarTema();
+  document.getElementById("pie-equipo").textContent = deviceNombre();
+  setInterval(() => {
+    const el = document.getElementById("reloj");
+    if (el) el.textContent = new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }, 1000);
+
+  const est = await rpc("estado_sistema");
+  if (est && est.instalado === false) { mostrar("v-instalar"); return; }
+  if (est && est.error) {
+    document.getElementById("v-carga").querySelector(".cargando").textContent = textoError(est.error) + " Recarga la página.";
+    return;
+  }
+  if (token) {
+    const r = await rpc("mi_sesion", { p_token: token });
+    if (r.ok) { sesionLista(r.usuario); return; }
+    token = null; localStorage.removeItem("nx_token");
+  }
+  mostrar("v-login");
+}
+
+async function instalar() {
+  const p1 = document.getElementById("inst-pass1").value;
+  const p2 = document.getElementById("inst-pass2").value;
+  const eq = document.getElementById("inst-equipo").value.trim();
+  const err = document.getElementById("inst-error");
+  err.classList.add("oculto");
+  if (p1.length < 8) { err.textContent = textoError("PASSWORD_CORTA"); err.classList.remove("oculto"); return; }
+  if (p1 !== p2) { err.textContent = "Las contraseñas no coinciden."; err.classList.remove("oculto"); return; }
+  if (eq) localStorage.setItem("nx_device_nombre", eq);
+  const b = document.getElementById("inst-btn"); b.disabled = true; b.textContent = "Guardando…";
+  const d = infoDispositivo();
+  const r = await rpc("instalar", {
+    p_password: p1, p_disp_codigo: deviceCodigo(), p_disp_nombre: deviceNombre(),
+    p_nav: d.navegador, p_plat: d.plataforma
+  });
+  b.disabled = false; b.textContent = "Guardar y continuar";
+  if (!r.ok) { err.textContent = textoError(r.error); err.classList.remove("oculto"); return; }
+  mostrar("v-login");
+  document.getElementById("login-usuario").value = "jesus.admin";
+  const ok = document.getElementById("login-ok");
+  ok.textContent = "Contraseña guardada. Ya puedes iniciar sesión.";
+  ok.classList.remove("oculto");
+  document.getElementById("pie-equipo").textContent = deviceNombre();
+}
+
+async function entrar() {
+  const u = document.getElementById("login-usuario").value.trim();
+  const p = document.getElementById("login-pass").value;
+  const err = document.getElementById("login-error");
+  err.classList.add("oculto");
+  document.getElementById("login-ok").classList.add("oculto");
+  if (!u || !p) { err.textContent = "Escribe tu usuario y contraseña."; err.classList.remove("oculto"); return; }
+  const b = document.getElementById("login-btn"); b.disabled = true; b.textContent = "Entrando…";
+  const d = infoDispositivo();
+  const r = await rpc("login", {
+    p_usuario: u, p_password: p, p_disp_codigo: deviceCodigo(),
+    p_disp_nombre: deviceNombre(), p_nav: d.navegador, p_plat: d.plataforma
+  });
+  b.disabled = false; b.textContent = "Entrar";
+  if (!r.ok) {
+    if (r.error === "DISPOSITIVO_PENDIENTE") {
+      document.getElementById("pend-codigo").textContent = deviceNombre() + " · " + deviceCodigo().slice(0, 8).toUpperCase();
+      mostrar("v-pendiente");
+      return;
+    }
+    err.textContent = textoError(r.error); err.classList.remove("oculto"); return;
+  }
+  token = r.token; localStorage.setItem("nx_token", token);
+  document.getElementById("login-pass").value = "";
+  sesionLista(r.usuario);
+}
+
+function sesionLista(u) {
+  usuario = u;
+  document.getElementById("chip-nombre").textContent = u.nombre;
+  document.getElementById("chip-rol").textContent = u.rol === "superadmin" ? "Superadministrador" : (u.rol === "moderador" ? "Moderador" : "Empleado");
+  document.getElementById("chip-ava").textContent = (u.nombre || "?").charAt(0).toUpperCase();
+  document.getElementById("nav-admin").style.display = (u.rol === "superadmin" || u.rol === "moderador") ? "" : "none";
+  const c = document.getElementById("cfg-equipo"); if (c) c.textContent = deviceNombre();
+  mostrar("app");
+  irA("inicio");
+  latido();
+}
+
+function salirLocal(mensajeCodigo) {
+  token = null; usuario = null;
+  localStorage.removeItem("nx_token");
+  clearInterval(timerRefresco);
+  mostrar("v-login");
+  if (mensajeCodigo) {
+    const err = document.getElementById("login-error");
+    err.textContent = textoError(mensajeCodigo); err.classList.remove("oculto");
+  }
+}
+async function salir() {
+  if (token) await rpc("logout", { p_token: token });
+  salirLocal();
+  toast("Sesión cerrada");
+}
+
+/* ================= LATIDO + MONITOREO + INACTIVIDAD ================= */
+["click", "keydown", "touchstart", "scroll"].forEach(ev =>
+  document.addEventListener(ev, () => { ultimaActividad = Date.now(); }, { passive: true }));
+
+async function latido() {
+  if (!token) return;
+  const d = infoDispositivo();
+  const con = navigator.connection || {};
+  const mem = performance.memory ? {
+    usada_mb: Math.round(performance.memory.usedJSHeapSize / 1048576),
+    limite_mb: Math.round(performance.memory.jsHeapSizeLimit / 1048576)
+  } : {};
+  const r = await rpc("latido", {
+    p_token: token,
+    p_info: {
+      equipo: deviceNombre(), so: d.plataforma, navegador: d.navegador,
+      conexion: con.effectiveType || "desconocida",
+      calidad: con.downlink ? (con.downlink >= 5 ? "buena" : (con.downlink >= 1.5 ? "media" : "baja")) : "desconocida",
+      app_abierta: !document.hidden, memoria: mem
+    }
+  });
+  if (r && !r.ok && (r.error === "SESION_INVALIDA" || r.error === "SESION_EXPIRADA" || r.error === "USUARIO_SUSPENDIDO")) {
+    salirLocal(r.error);
+  }
+}
+setInterval(latido, 60000);
+setInterval(() => {
+  if (token && Date.now() - ultimaActividad > INACTIVIDAD_MIN * 60000) {
+    rpc("logout", { p_token: token });
+    salirLocal("SESION_EXPIRADA");
+  }
+}, 30000);
+
+/* ================= NAVEGACIÓN ================= */
+const TITULOS = { inicio: "Inicio", equipos: "Equipos", sesiones: "Sesiones", bitacora: "Bitácora", config: "Configuración" };
+function abrirMenu() { document.getElementById("lateral").classList.add("abierto"); document.getElementById("velo").classList.add("abierto"); }
+function cerrarMenu() { document.getElementById("lateral").classList.remove("abierto"); document.getElementById("velo").classList.remove("abierto"); }
+
+function irA(v) {
+  vistaActual = v;
+  cerrarMenu();
+  ["inicio", "equipos", "sesiones", "bitacora", "config"].forEach(x =>
+    document.getElementById("vista-" + x).classList.toggle("oculto", x !== v));
+  document.querySelectorAll(".nav-item[data-vista]").forEach(b =>
+    b.classList.toggle("activo", b.dataset.vista === v));
+  document.getElementById("titulo-vista").textContent = TITULOS[v] || v;
+  clearInterval(timerRefresco);
+  cargarVista();
+  if (v === "inicio" || v === "equipos" || v === "sesiones") {
+    timerRefresco = setInterval(cargarVista, 15000);
+  }
+}
+
+async function cargarVista() {
+  if (!token) return;
+  if (vistaActual === "inicio") cargarInicio();
+  else if (vistaActual === "equipos") cargarEquipos();
+  else if (vistaActual === "sesiones") cargarSesiones();
+  else if (vistaActual === "bitacora") cargarBitacora();
+}
+
+/* ================= VISTAS ================= */
+async function cargarInicio() {
+  if (!usuario || usuario.rol === "empleado") return;
+  const r = await rpc("panel_resumen", { p_token: token });
+  if (!r.ok) return;
+  document.getElementById("m-usuarios").textContent = r.usuarios_total;
+  document.getElementById("m-sesiones").textContent = r.sesiones_activas;
+  document.getElementById("m-aprobados").textContent = r.disp_aprobados;
+  document.getElementById("m-pendientes").textContent = r.disp_pendientes;
+  const av = document.getElementById("aviso-pendientes");
+  const alerta = document.getElementById("alerta-equipos");
+  if (r.disp_pendientes > 0) {
+    av.querySelector("span").innerHTML = `Hay <b>${r.disp_pendientes}</b> equipo(s) esperando tu autorización. Revísalos en la sección <b>Equipos</b>.`;
+    av.classList.remove("oculto"); alerta.classList.remove("oculto");
+  } else { av.classList.add("oculto"); alerta.classList.add("oculto"); }
+}
+
+async function cargarEquipos() {
+  const r = await rpc("dispositivos_lista", { p_token: token });
+  const cont = document.getElementById("lista-equipos");
+  if (!r.ok) { cont.innerHTML = `<div class="vacio">${textoError(r.error)}</div>`; return; }
+  if (!r.dispositivos.length) { cont.innerHTML = `<div class="vacio">Aún no hay equipos registrados.<br>Cuando alguien abra la aplicación en una computadora nueva, aparecerá aquí para que la autorices.</div>`; return; }
+  cont.innerHTML = r.dispositivos.map(d => {
+    const chip = d.aprobado === "aprobado"
+      ? `<span class="estado-chip ec-verde"><span class="punto p-verde"></span>Autorizado</span>`
+      : d.aprobado === "pendiente"
+      ? `<span class="estado-chip ec-amarillo"><span class="punto p-amarillo"></span>Pendiente</span>`
+      : `<span class="estado-chip ec-rojo"><span class="punto p-rojo"></span>Rechazado</span>`;
+    const linea = d.en_linea ? ` · <span style="color:var(--verde);font-weight:600">en línea</span>` : "";
+    const btns = usuario.rol === "superadmin" ? `
+      ${d.aprobado !== "aprobado" ? `<button class="mini-btn verde" onclick="accionEquipo('${d.id}','aprobado')">Autorizar</button>` : ""}
+      ${d.aprobado !== "rechazado" ? `<button class="mini-btn rojo" onclick="accionEquipo('${d.id}','rechazado')">Rechazar</button>` : ""}
+      <button class="mini-btn" onclick="renombrarEquipo('${d.id}','${esc(d.nombre)}')">Renombrar</button>` : "";
+    return `<div class="fila">
+      <div class="info">
+        <b>${esc(d.nombre)} ${chip}</b>
+        <span>${esc(d.plataforma || "")} · ${esc(d.navegador || "")} · IP ${esc(d.ip || "—")}${linea}<br>
+        Último usuario: ${esc(d.ultimo_usuario || "—")} · Última conexión: ${fechaCorta(d.ultima)}</span>
+      </div>
+      <div class="acciones">${btns}</div>
+    </div>`;
+  }).join("");
+}
+async function accionEquipo(id, accion) {
+  if (accion === "rechazado" && !confirm("¿Rechazar este equipo? Sus sesiones activas se cerrarán.")) return;
+  const r = await rpc("dispositivo_accion", { p_token: token, p_id: id, p_accion: accion, p_nombre: null });
+  if (r.ok) { toast(accion === "aprobado" ? "Equipo autorizado" : "Equipo rechazado"); cargarEquipos(); cargarInicio(); }
+  else toast(textoError(r.error));
+}
+async function renombrarEquipo(id, actual) {
+  const n = prompt("Nuevo nombre del equipo:", actual);
+  if (!n || !n.trim()) return;
+  const r = await rpc("dispositivo_accion", { p_token: token, p_id: id, p_accion: null, p_nombre: n.trim() });
+  if (r.ok) { toast("Nombre actualizado"); cargarEquipos(); } else toast(textoError(r.error));
+}
+
+async function cargarSesiones() {
+  const r = await rpc("sesiones_activas", { p_token: token });
+  const cont = document.getElementById("lista-sesiones");
+  if (!r.ok) { cont.innerHTML = `<div class="vacio">${textoError(r.error)}</div>`; return; }
+  if (!r.sesiones.length) { cont.innerHTML = `<div class="vacio">No hay sesiones activas en este momento.</div>`; return; }
+  cont.innerHTML = r.sesiones.map(s => {
+    const punto = s.en_linea ? "p-verde" : "p-gris";
+    const rol = s.rol === "superadmin" ? "Superadmin" : (s.rol === "moderador" ? "Moderador" : "Empleado");
+    const btn = (usuario.rol === "superadmin" && s.usuario_login !== usuario.usuario)
+      ? `<button class="mini-btn rojo" onclick="cerrarRemota('${s.id}','${esc(s.usuario)}')">Cerrar sesión</button>` : "";
+    return `<div class="fila">
+      <div class="info">
+        <b><span class="punto ${punto}"></span>${esc(s.usuario)} <span style="font-weight:500;color:var(--suave);font-size:11px">${rol}</span></b>
+        <span>${esc(s.equipo || "Equipo desconocido")} · IP ${esc(s.ip || "—")} · ${esc(s.navegador || "")}<br>
+        Entró: ${fechaCorta(s.inicio)} · Última actividad: ${fechaCorta(s.ultimo_activo)}</span>
+      </div>
+      <div class="acciones">${btn}</div>
+    </div>`;
+  }).join("");
+}
+async function cerrarRemota(id, nombre) {
+  if (!confirm(`¿Cerrar la sesión de ${nombre}?`)) return;
+  const r = await rpc("sesion_cerrar", { p_token: token, p_id: id });
+  if (r.ok) { toast("Sesión cerrada"); cargarSesiones(); } else toast(textoError(r.error));
+}
+
+const ACCIONES = {
+  instalacion: "Configuración inicial del sistema",
+  inicio_sesion: "Inicio de sesión",
+  cierre_sesion: "Cierre de sesión",
+  cierre_remoto: "Cierre de sesión remoto",
+  cambio_password: "Cambio de contraseña",
+  dispositivo_pendiente: "Intento desde equipo no autorizado",
+  dispositivo_aprobado: "Equipo autorizado",
+  dispositivo_rechazado: "Equipo rechazado",
+  dispositivo_pendiente_marcado: "Equipo marcado como pendiente",
+  dispositivo_renombrado: "Equipo renombrado"
+};
+async function cargarBitacora() {
+  const r = await rpc("bitacora_lista", { p_token: token, p_limite: 100 });
+  const cont = document.getElementById("lista-bitacora");
+  if (!r.ok) { cont.innerHTML = `<div class="vacio">${textoError(r.error)}</div>`; return; }
+  if (!r.bitacora.length) { cont.innerHTML = `<div class="vacio">Sin movimientos registrados todavía.</div>`; return; }
+  cont.innerHTML = r.bitacora.map(b => {
+    const det = [];
+    if (b.detalle && b.detalle.equipo) det.push("Equipo: " + b.detalle.equipo);
+    if (b.detalle && b.detalle.afectado) det.push("Afectado: " + b.detalle.afectado);
+    return `<div class="fila">
+      <div class="info">
+        <b>${esc(ACCIONES[b.accion] || b.accion)}</b>
+        <span>${esc(b.usuario || "Sistema")} · ${fechaCorta(b.fecha)} · IP ${esc(b.ip || "—")}${det.length ? " · " + esc(det.join(" · ")) : ""}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function cambiarPass() {
+  const a = document.getElementById("cfg-actual").value;
+  const n = document.getElementById("cfg-nueva").value;
+  const err = document.getElementById("cfg-error"), ok = document.getElementById("cfg-ok");
+  err.classList.add("oculto"); ok.classList.add("oculto");
+  const r = await rpc("cambiar_password", { p_token: token, p_actual: a, p_nueva: n });
+  if (!r.ok) { err.textContent = textoError(r.error); err.classList.remove("oculto"); return; }
+  ok.textContent = "Contraseña actualizada. Tus otras sesiones se cerraron por seguridad.";
+  ok.classList.remove("oculto");
+  document.getElementById("cfg-actual").value = ""; document.getElementById("cfg-nueva").value = "";
+}
+
+iniciar();
+</script>
+</body>
+</html>
